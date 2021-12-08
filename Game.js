@@ -24,18 +24,16 @@ class Game {
     playerCount = player.getCount();
     form = new Form();
     form.display();
-    player1 = createSprite(width / 2 - 200, height - 50);
+    player1 = createSprite(width / 2 - 50, height - 100);
     player1.addImage("player1", soldierImg);
-    player1.scale = 0.3;
-    player2 = createSprite(width / 2 + 200, height - 50);
+    player1.scale = 0.5;
+    player2 = createSprite(width / 2 + 100, height - 100);
     player2.addImage("player2", soldierImg);
-    player2.scale = 0.3;
+    player2.scale = 0.5;
     players = [player1, player2];
-    
-    
-
 
     obstacles = new Group();
+    bulletsGroup = new Group();
 
     var obstaclesPositions = [
       { x: width / 2 + 250, y: height - 800, image: robotImg },
@@ -59,6 +57,8 @@ class Game {
       0.4,
       obstaclesPositions
     );
+
+    obstacles.setVelocityYEach(4);
   }
   addSprites(spriteGroup, numberOfSprites, spriteImage, scale, positions = []) {
     for (var i = 0; i < numberOfSprites; i++) {
@@ -74,8 +74,12 @@ class Game {
         y = random(-height * 4.5, height - 400);
       }
       var sprite = createSprite(x, y);
+      if(spriteImage!=null){
       sprite.addImage("sprite", spriteImage);
-
+      }
+      else{
+        sprite.shapeColor="orange";
+      }
       sprite.scale = scale;
       spriteGroup.add(sprite);
     }
@@ -104,12 +108,7 @@ class Game {
     this.handleResetButton();
     Player.getPlayersInfo();
     if (allPlayers !== undefined) {
-      image(backgroundImage2, -width/2, -height/2, width*2, height*2 );
-
-      
-      //bg = createSprite(width/2, height/2, width, height)
-      //bg.addImage("backgroundImage2",backgroundImage2)
-      //bg.scale = 2
+      image(backgroundImage2, 0, -height * 5, width, height * 6);
       this.showLeaderboard();
       var index = 0;
       for (var plr in allPlayers) {
@@ -118,35 +117,19 @@ class Game {
         var y = height - allPlayers[plr].positionY;
         players[index - 1].position.x = x;
         players[index - 1].position.y = y;
-        console.log(players[index - 1].position.x )
-        console.log(players[index - 1].position.y )
         if (index === player.index) {
           stroke(10);
           fill("red");
-          ellipse(x, y, 80, 80);
+          ellipse(x, y, 60, 60);
           //camera .position.x = players[index-1].position.x
           camera.position.y = players[index - 1].position.y;
-          if(keyIsDown("space")){
-            beam = createSprite(width / 2 - 200, height - 50)
-            beam.addImage("beam",beamImg)
-            beam.x = players[index - 1].position.x 
-            beam.y = players[index - 1].position.y
-
-            beam.velocityY = -5
-            
-         
-        } 
         }
       }
-      //this.addRobots();
-      obstacles.setVelocityYEach(3)
+      
       this.handlePlayerControls();
-      this.shootRobots();
       drawSprites();
     }
   }
-
-
 
   handleResetButton() {
     this.resetButton.mousePressed(() => {
@@ -216,11 +199,18 @@ class Game {
       player.positionX += 5;
       player.update();
     }
-  }
-  addRobots() {
-    if (this.index == 1) {
-      var enemyRobot = createSprite(random(1, 200), random(10, 100));
-      enemyRobot.addImage("robot", robotImg);
+
+    if (keyIsDown(32)) {
+      if(player.index == 1){
+      var bullet = createSprite(players[0].position.x,players[0].position.y,100,100);
+      }
+      else if(player.index == 2){
+      var bullet = createSprite(players[1].position.x,players[1].position.y,100,100);
+      }
+      bullet.shapeColor = "red";
+      bullet.velocityY = -5;
+      bulletsGroup.add(bullet);
     }
   }
+  
 }
